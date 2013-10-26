@@ -1,6 +1,6 @@
 /*
  * jQuery Plugin: Tokenizing Autocomplete Text Entry
- * Version 1.6.1
+ * Version 1.6.1-1
  *
  * Copyright (c) 2009 James Smith (http://loopj.com)
  * Licensed jointly under the GPL and MIT licenses,
@@ -258,7 +258,10 @@ $.TokenList = function (input, url_or_data, settings) {
                 return false;
             } else
             if ($(input).data("settings").tokenLimit === null || $(input).data("settings").tokenLimit !== token_count) {
-                show_dropdown_hint();
+                if ($(input).data("settings").minChars === 0)
+                   setTimeout(function(){do_search();},5);
+                else
+                   show_dropdown_hint();
             }
             token_list.addClass($(input).data("settings").classes.focused);
         })
@@ -329,7 +332,10 @@ $.TokenList = function (input, url_or_data, settings) {
 
                         return false;
                     } else if($(this).val().length === 1) {
-                        hide_dropdown();
+                        if ($(input).data("settings").minChars === 0)
+                            setTimeout(function(){do_search();},5);
+                        else
+                            hide_dropdown();
                     } else {
                         // set a timeout just long enough to let this function finish.
                         setTimeout(function(){do_search();}, 5);
@@ -917,7 +923,7 @@ $.TokenList = function (input, url_or_data, settings) {
     function do_search() {
         var query = input_box.val();
 
-        if(query && query.length) {
+        if(typeof(query) == "string" && query.length >= $(input).data("settings").minChars) {
             if(selected_token) {
                 deselect_token($(selected_token), POSITION.AFTER);
             }
